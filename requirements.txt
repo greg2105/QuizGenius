@@ -1,3 +1,3 @@
-Flask
-torch
-transformers
+Flask==2.1.1
+torch==1.10.1
+transformers==4.15.0
