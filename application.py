@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import torch
 from transformers import pipeline
 
-app = Flask(__name__)
+application = Flask(__name__)
 
 # LOAD LLM MODEL
 model_name = "databricks/dolly-v2-12b"
@@ -32,4 +32,4 @@ def generate_quiz():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    application.run(host='0.0.0.0', port=5000)
