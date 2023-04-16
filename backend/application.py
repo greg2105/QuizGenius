@@ -6,19 +6,42 @@ from youtube_transcript_api import YouTubeTranscriptApi
 
 application = Flask(__name__)
 
-#THIS MODULE RETRIEVES THE TRANSCRIPT OF THE YOUTUBE VIDEO
-def get_transcript_text(video_id):
-    transcript = YouTubeTranscriptApi.get_transcript(video_id)
-    transcript_text = ' '.join([entry['text'] for entry in transcript])
-    return transcript_text
+#THIS MODULE GRABS THE TEXT FROM THE TRANSCRIPT
+def get_transcript_text(video_id, start_time, end_time):
+    try:
+        transcript = YouTubeTranscriptApi.get_transcript(video_id)
+    except Exception as e:
+        print(f"Error fetching transcript: {e}")
+        return ""
 
+    transcript_text = ""
+    for entry in transcript:
+        if entry['start'] >= start_time and entry['start'] <= end_time:
+            transcript_text += f"{entry['text']} "
+
+    return transcript_text.strip()
+
+#THIS MODULE RETRIEVES THE TRANSCRIPT OF THE YOUTUBE VIDEO
+@application.route('/get_transcript', methods=['POST'])
+def get_transcript():
+    data = request.get_json()
+
+    if 'video_id' not in data or 'start_time' not in data or 'end_time' not in data:
+        return jsonify({'error': 'Missing video_id, start_time, or end_time field'}), 400
+
+    video_id = data['video_id']
+    start_time = data['start_time']
+    end_time = data['end_time']
+
+    transcript_text = get_transcript_text(video_id, start_time, end_time)
+    return jsonify({'transcript': transcript_text})
 
 #THIS MODULE CREATES THE QUIZ
 openai.api_key = config.chatgpt_api_key
 @application.route('/generate_quiz', methods=['POST'])
 def generate_quiz():
     print("request received")
-    data = request.get_json()
+    data = {"text": get_transcript.transcript_text}
 
     # Check if the input text is provided
     if 'text' not in data:

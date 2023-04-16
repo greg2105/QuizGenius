@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Generator</title>
+</head>
+<body>
+  <h1>Quiz Generator</h1>
+  <div>
+    <label for="video_id">Video ID:</label>
+    <input type="text" id="video_id">
+  </div>
+  <div>
+    <label for="interval">Quiz interval (minutes):</label>
+    <input type="number" id="interval" value="5">
+  </div>
+  <button id="generate_quiz">Generate Quiz</button>
+  <pre id="quiz_output"></pre>
+
+  <script>
+    const videoIdInput = document.getElementById('video_id');
+    const intervalInput = document.getElementById('interval');
+    const generateQuizButton = document.getElementById('generate_quiz');
+    const quizOutput = document.getElementById('quiz_output');
+
+    let startTime = 0;
+    let endTime = parseInt(intervalInput.value) * 60; // Convert minutes to seconds
+
+    generateQuizButton.addEventListener('click', async () => {
+      const videoId = videoIdInput.value;
+      const transcript = await getTranscript(videoId, startTime, endTime);
+      const quiz = await generateQuiz(transcript);
+
+      quizOutput.textContent = JSON.stringify(quiz, null, 2);
+
+      // Update start and end times for the next quiz
+      startTime = endTime;
+      endTime += parseInt(intervalInput.value) * 60;
+    });
+  </script>
+</body>
+</html>
