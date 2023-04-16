@@ -4,7 +4,7 @@ import openai
 import config
 from youtube_transcript_api import YouTubeTranscriptApi
 
-application = Flask(__name__)
+application = app = Flask(__name__)
 
 #THIS MODULE GRABS THE TEXT FROM THE TRANSCRIPT
 def get_transcript_text(video_id, start_time, end_time):
