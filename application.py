@@ -1,15 +1,14 @@
 from flask import Flask, request, jsonify
 import torch
-from transformers import pipeline
+import openai
+import config
 
 application = Flask(__name__)
 
 # LOAD LLM MODEL
-model_name = "databricks/dolly-v2-12b"
-instruct_pipeline = pipeline(model=model_name, trust_remote_code=True, device_map="auto")
+openai.api_key = config.chatgpt_api_key
 
-
-@app.route('/generate_quiz', methods=['POST'])
+@application.route('/generate_quiz', methods=['POST'])
 def generate_quiz():
     print("request received")
     data = request.get_json()
@@ -23,13 +22,19 @@ def generate_quiz():
     # Add a prompt to the input text
     prompted_input_text = f"Based on the following text, generate 5 multiple-choice quiz questions and answers: {input_text}"
 
+    completion = openai.ChatCompletion.create(
+        model = "gpt-3.5-turbo",
+        messages=[
+        {"role": "user", "content" : prompted_input_text}
+        ]
+    )
+
     # Generate questions using the LLM
-    generated_questions = instruct_pipeline(prompted_input_text)
+    generated_questions = completion.choices[0].message.content
     print("Quiz generation completed")
     
     # Return the generated questions and answers in JSON format
     return jsonify({'questions': generated_questions})
 
-
 if __name__ == '__main__':
-    application.run(host='0.0.0.0', port=5000)
+    application.run()
