@@ -2,12 +2,19 @@ from flask import Flask, request, jsonify
 import torch
 import openai
 import config
+from youtube_transcript_api import YouTubeTranscriptApi
 
 application = Flask(__name__)
 
-# LOAD LLM MODEL
-openai.api_key = config.chatgpt_api_key
+#THIS MODULE RETRIEVES THE TRANSCRIPT OF THE YOUTUBE VIDEO
+def get_transcript_text(video_id):
+    transcript = YouTubeTranscriptApi.get_transcript(video_id)
+    transcript_text = ' '.join([entry['text'] for entry in transcript])
+    return transcript_text
 
+
+#THIS MODULE CREATES THE QUIZ
+openai.api_key = config.chatgpt_api_key
 @application.route('/generate_quiz', methods=['POST'])
 def generate_quiz():
     print("request received")
