@@ -67,4 +67,4 @@ def generate_quiz():
     return jsonify({'questions': generated_questions})
 
 if __name__ == '__main__':
-    application.run()
+    app.run(host='0.0.0.0', port=5000)
